@@ -5,13 +5,13 @@ catkin_package()
 include_directories(${catkin_INCLUDE_DIRS})
 link_directories(${catkin_LIBRARY_DIRS})
 
-find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-include(${QT_USE_FILE})
+find_package(Qt5 COMPONENTS Core Widgets Quick REQUIRED)
+set(QT_LIBRARIES Qt5::Widgets)
 
 add_definitions(-DQT_NO_KEYWORDS)
 
 
-qt4_wrap_cpp(MOC_FILES
+qt5_wrap_cpp(MOC_FILES
   src/ndt_display.hpp
   src/ndt_line_display.hpp
 )
@@ -34,7 +34,7 @@ set(SOURCE_FILES
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 
 ## Link the library with whatever Qt libraries have been defined by
-## the ``find_package(Qt4 ...)`` line above, and with whatever libraries
+## the ``find_package(Qt5 ...)`` line above, and with whatever libraries
 ## catkin has included.
 ##
 ## Although this puts "rviz_plugin_tutorials" (or whatever you have

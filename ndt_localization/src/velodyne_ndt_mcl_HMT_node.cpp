@@ -28,6 +28,7 @@
 
 #include <velodyne_pointcloud/rawdata.h>
 #include <velodyne_pointcloud/point_types.h>
+#include <velodyne_pointcloud/pointcloudXYZIR.h>
 
 //std
 #include <Eigen/Dense>
@@ -248,16 +249,16 @@ class particle_filter_wrap {
 	lslgeneric::NDTMap* VelodyneToNDT(const velodyne_msgs::VelodyneScan::ConstPtr& scan){
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 		for(size_t next = 0; next < scan->packets.size(); ++next){
-			velodyne_rawdata::VPointCloud pnts;
+			velodyne_pointcloud::PointcloudXYZIR pnts;
 			dataParser.unpack(scan->packets[next], pnts);
-			for(size_t i = 0; i < pnts.size(); i++){
+			for(size_t i = 0; i < pnts.pc->size(); i++){
 				pcl::PointXYZ p;
-				p.x = pnts.points[i].x;
-				p.y = pnts.points[i].y;
-				p.z = pnts.points[i].z;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       //pnts.points[i].z;
+				p.x = pnts.pc->points[i].x;
+				p.y = pnts.pc->points[i].y;
+				p.z = pnts.pc->points[i].z;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       //pnts.points[i].z;
 				cloud->push_back(p);
 			}
-			pnts.clear();
+			pnts.pc->clear();
 		}                                                                                                                                                                                                    //*< number of cells along z axis
 		//ROS_INFO_STREAM(cloud->size());
 		Eigen::Affine3f transform_2 = Eigen::Affine3f::Identity();

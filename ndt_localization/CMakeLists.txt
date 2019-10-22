@@ -131,6 +131,7 @@ add_executable(ndt_map_publisher src/map_publisher.cpp)
  target_link_libraries(velodyne_ndt_mcl_node
    ${catkin_LIBRARIES}
    ${PROJECT_NAME}
+   velodyne_pointcloudXYZIR
  )
 
  #target_link_libraries(velodyne_ndt_mcl_HMT_node

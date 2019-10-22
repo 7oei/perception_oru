@@ -53,6 +53,8 @@ find_package(OpenCV REQUIRED)
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${EIGEN_INCLUDE_DIRS})
 include_directories(include ${PCL_INCLUDE_DIRS})
+include_directories(include ${OpenCV_INCLUDE_DIRS})
+
 add_definitions(${EIGEN_DEFINITIONS})
 link_directories(${catkin_LIBRARY_DIRS})
 
@@ -67,16 +69,16 @@ link_directories(${catkin_LIBRARY_DIRS})
 #make a node that listens to point clouds and makes ndts
 
 #target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(histTest ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(histTest ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries(jffSaveTest ${catkin_LIBRARIES})
 #target_link_libraries(jffLoadTest ${catkin_LIBRARIES})
-target_link_libraries(test_map_topic ${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(test_map_topic_1 ${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(ndt_builder ${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(test_occ_map_topic ${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(test_map_topic ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(test_map_topic_1 ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(ndt_builder ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(test_occ_map_topic ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #add_executable(likelihood_test test/ndtLikelihoodTester.cc)
 #target_link_libraries(likelihood_test ${PROJECT_NAME}  pointcloud_vrml)

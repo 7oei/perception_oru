@@ -34,6 +34,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <velodyne_pointcloud/rawdata.h>
 #include <velodyne_pointcloud/point_types.h>
+#include <velodyne_pointcloud/pointcloudXYZIR.h>
 #include <pcl_ros/impl/transforms.hpp>
 
 #include "message_filters/subscriber.h"
@@ -582,7 +583,8 @@ bool do_pub_ndt_markers_;
         // We're interessted in getting the pointcloud in the vehicle frame (that is to transform it using the sensor pose offset).
         pcl::PointCloud<pcl::PointXYZ> cloud;
         
-        velodyne_rawdata::VPointCloud pnts,conv_points;
+        velodyne_pointcloud::PointcloudXYZIR pnts;
+        velodyne_rawdata::VPointCloud conv_points;
         tf::Transform T_sensorpose;
         tf::transformEigenToTF(sensorPoseT, T_sensorpose);
 
@@ -598,7 +600,7 @@ bool do_pub_ndt_markers_;
             }
             
             tf::Transform Tcloud =  T * T_sensorpose;
-            pcl_ros::transformPointCloud(pnts,conv_points,Tcloud);
+            pcl_ros::transformPointCloud(*(pnts.pc),conv_points,Tcloud);
             for (size_t i = 0; i < conv_points.size(); i++) {
                 if (skip_nb_rings_ == 0) {
                     cloud.push_back(pcl::PointXYZ(conv_points.points[i].x,
@@ -614,7 +616,7 @@ bool do_pub_ndt_markers_;
                     
                 }
             }
-            pnts.clear();
+            pnts.pc->clear();
             conv_points.clear();
         }
 
@@ -691,7 +693,8 @@ bool do_pub_ndt_markers_;
         // We're interessted in getting the pointcloud in the vehicle frame (that is to transform it using the sensor pose offset).
         pcl::PointCloud<pcl::PointXYZ> cloud;
         
-        velodyne_rawdata::VPointCloud pnts,conv_points;
+        velodyne_pointcloud::PointcloudXYZIR pnts;
+        velodyne_rawdata::VPointCloud conv_points;
         tf::Transform T_sensorpose;
         tf::transformEigenToTF(sensorPoseT2, T_sensorpose);
 
@@ -707,13 +710,13 @@ bool do_pub_ndt_markers_;
             }
             
             tf::Transform Tcloud =  T * T_sensorpose;
-            pcl_ros::transformPointCloud(pnts,conv_points,Tcloud);
+            pcl_ros::transformPointCloud(*(pnts.pc),conv_points,Tcloud);
             for (size_t i = 0; i < conv_points.size(); i++) {
                 cloud.push_back(pcl::PointXYZ(conv_points.points[i].x,
                                               conv_points.points[i].y,
                                               conv_points.points[i].z));
             }
-            pnts.clear();
+            pnts.pc->clear();
             conv_points.clear();
         }
 

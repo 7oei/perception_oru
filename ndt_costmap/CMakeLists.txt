@@ -25,6 +25,7 @@ find_package(OpenGL REQUIRED)
 #FIND_PACKAGE(MRPT REQUIRED gui;base;opengl)
 #include_directories(${JPEG_INCLUDE_DIR})
 #include_directories(${GLUT_INCLUDE_DIR})
+find_package(OpenCV REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 

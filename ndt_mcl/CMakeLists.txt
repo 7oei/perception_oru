@@ -58,7 +58,7 @@ add_executable(3d_ndt_mcl_node src/3d_ndt_mcl_node.cpp)
 target_link_libraries(3d_ndt_mcl_node ${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${OPENGL_LIBRARIES})# ${MRPT_LIBS}${LIBXML2_LIBRARIES} ${GLUT_LIBRARIES} ${JPEG_LIBRARIES} )
 
 add_executable(3d_ndt_mcl_node2 src/3d_ndt_mcl_node2.cpp)
-target_link_libraries(3d_ndt_mcl_node2 ${PROJECT_NAME} ${Boost_LIBRARIES} ${OPENGL_LIBRARIES} ${catkin_LIBRARIES} velodyne_rawdata) # ${MRPT_LIBS}${LIBXML2_LIBRARIES} ${GLUT_LIBRARIES} ${JPEG_LIBRARIES} )
+target_link_libraries(3d_ndt_mcl_node2 ${PROJECT_NAME} ${Boost_LIBRARIES} ${OPENGL_LIBRARIES} ${catkin_LIBRARIES} velodyne_rawdata velodyne_pointcloudXYZIR) # ${MRPT_LIBS}${LIBXML2_LIBRARIES} ${GLUT_LIBRARIES} ${JPEG_LIBRARIES} )
 
 ## Generate added messages and services with any dependencies listed here
 #generate_messages(

@@ -8,6 +8,7 @@ project(sdf_tracker)
 
 find_package(cmake_modules REQUIRED)
 find_package(Eigen REQUIRED)
+find_package(OpenCV REQUIRED)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs cv_bridge)
 
 catkin_package(
@@ -35,10 +36,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   # TODO: List your msg files here
 #)
 
-include_directories(${EIGEN_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} include)
+include_directories(${EIGEN_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} include)
 add_definitions(${EIGEN_DEFINITIONS})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${VTK_LIBRARIES})
-target_link_libraries(sdf_tracker_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${VTK_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(sdf_tracker_node ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PROJECT_NAME} ${OpenCV_LIBS})
 
 #target_link_libraries(example ${PROJECT_NAME})
 ## Generate added messages and services with any dependencies listed here
