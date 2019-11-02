@@ -2,6 +2,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/features/feature.h>
 #include <pcl/common/common.h>
+#include <pcl/io/io.h>
+#include <pcl/io/pcd_io.h>
 
 #include <string>
 #include <climits>
@@ -1443,7 +1445,6 @@ int NDTMap::writeCellVectorJFF(FILE * jffout)
         }
         it++;
     }
-
     return 0;
 
 }
@@ -1504,13 +1505,22 @@ int NDTMap::writeLazyGridJFF(FILE * jffout)
 
     fwrite(ind->getProtoType(), sizeof(NDTCell), 1, jffout);
 
+
+    pcl::PointCloud<pcl::PointXYZ> pointcloud;
     // loop through all active cells
     typename SpatialIndex::CellVectorItr it = index_->begin();
     while (it != index_->end())
     {
-	if((*it)->writeToJFF(jffout) < 0)	return -1;
-        it++;
+    	if((*it)->writeToJFF(jffout) < 0)	return -1;
+      if((*it)->hasGaussian_)
+      {
+        Eigen::Vector3d mean = (*it)->getMean();
+        pcl::PointXYZ p((float)mean.coeff(0), (float)mean.coeff(1), (float)mean.coeff(2));
+        pointcloud.push_back(p);
+      }
+      it++;
     }
+    pcl::io::savePCDFileBinary("ndt_map_pointcloud.pcd", pointcloud);
 
     return 0;
 
