@@ -249,6 +249,8 @@ bool do_pub_ndt_markers_;
 	    }
 
             double sensor_time_offset;
+            bool load_map_from_PCD;
+            double size_x_meters,size_y_meters,size_z_meters;            
             param_nh.param("sensor_time_offset", sensor_time_offset, 0.);
             sensorTimeOffset_ = ros::Duration(sensor_time_offset);
             param_nh.param("sensor_time_offset2", sensor_time_offset, 0.);
@@ -262,6 +264,10 @@ bool do_pub_ndt_markers_;
 	    param_nh.param<std::string>("output_map_file_name", output_map_name, std::string("ndt_mapper_output.ndmap"));
 	    param_nh.param<double>("map_resolution", resolution , 0.2);
 	    param_nh.param<double>("subsample_level", subsample_level , 1);
+        param_nh.getParam("load_map_from_PCD", load_map_from_PCD);
+        param_nh.getParam("size_x_meters", size_x_meters);
+        param_nh.getParam("size_y_meters", size_y_meters);
+        param_nh.getParam("size_z_meters", size_z_meters);
 
             fprintf(stderr,"USING RESOLUTION %lf\n",resolution);
 	    
@@ -274,7 +280,7 @@ bool do_pub_ndt_markers_;
 	    /// Prepare MCL object 
 	    //////////////////////////////////////////////////////////
 
-	    ndtmcl = new NDTMCL3D(resolution,ndmap,-1000);
+	    ndtmcl = new NDTMCL3D(load_map_from_PCD,mapName,size_x_meters,size_y_meters,size_z_meters,pose_init_x,pose_init_y,resolution,ndmap,-1000);
 	    param_nh.param<bool>("forceSIR", forceSIR, false);
 	    if(forceSIR) ndtmcl->forceSIR=true;
 

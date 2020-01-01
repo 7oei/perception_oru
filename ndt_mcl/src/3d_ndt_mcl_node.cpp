@@ -153,7 +153,7 @@ class NDTMCL3DNode {
 	    /// Prepare MCL object 
 	    //////////////////////////////////////////////////////////
 
-	    ndtmcl = new NDTMCL3D(resolution,ndmap,-5);
+	    ndtmcl = new NDTMCL3D(false,mapName,0,0,0,0,0,resolution,ndmap,-5);
 	    param_nh.param<bool>("forceSIR", forceSIR, false);
 	    if(forceSIR) ndtmcl->forceSIR=true;
 

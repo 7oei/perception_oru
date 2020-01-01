@@ -5,6 +5,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <pcl/io/io.h>
 #include <cstdio>
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
@@ -34,7 +35,7 @@ class NDTMCL3D{
         /**
 	 * Constructor
 	 */
-	NDTMCL3D(double map_resolution, lslgeneric::NDTMap &nd_map, double zfilter):
+	NDTMCL3D(bool load_map_from_PCD,std::string mapName,double size_x_meters,double size_y_meters,double size_z_meters,double pose_init_x,double pose_init_y,double map_resolution, lslgeneric::NDTMap &nd_map, double zfilter):
           map(new lslgeneric::LazyGrid(map_resolution)), SIR_varP_threshold(0.006), SIR_max_iters_wo_resampling(25)
 	{
             isInit = false;
@@ -44,39 +45,59 @@ class NDTMCL3D{
 	    counter = 0;
 	    zfilt_min = zfilter;
 	    sinceSIR = 0;
-	    ///First, lets make our target map match the given map
-	    ///This is done because we want (possibly) lower resolution target map
-	    double cx,cy,cz;
-	    if(!nd_map.getCentroid(cx, cy, cz)){
-		fprintf(stderr,"Centroid NOT Given-abort!\n");
-		exit(1);
-	    }else{
-		fprintf(stderr,"Centroid(%lf,%lf,%lf)\n",cx,cy,cz);
-	    }
-
-	    double wx,wy,wz;
-
-	    if(!nd_map.getGridSizeInMeters(wx, wy, wz)){
-		fprintf(stderr,"Grid size NOT Given-abort!\n");
-		exit(1);
-	    }else{
-		fprintf(stderr,"GridSize(%lf,%lf,%lf)\n",wx,wy,wz);
-	    }
-
-	    map.initialize(cx,cy,cz,wx,wy,wz);
-
-	    std::vector<lslgeneric::NDTCell*> ndts;
-	    ndts = nd_map.getAllCells();
-	    fprintf(stderr,"NDT MAP with %d components",(int)ndts.size());
-	    for(unsigned int i=0;i<ndts.size();i++){
-		Eigen::Vector3d m = ndts[i]->getMean();	
-		if(m[2]>zfilter){
-		    Eigen::Matrix3d cov = ndts[i]->getCov();
-		    unsigned int nump = ndts[i]->getN();
-		    //fprintf(stderr,"-%d-",nump);
-		    map.addDistributionToCell(cov, m,nump);
+		if(load_map_from_PCD){
+			map.initialize(pose_init_x,pose_init_y,0,size_x_meters,size_y_meters,size_z_meters);
+			pcl::PointCloud<pcl::PointXYZ> pointcloud;
+			pcl::io::loadPCDFile (mapName, pointcloud);
+			for(unsigned int i=0;i<pointcloud.points.size();i++){
+				Eigen::Vector3d m;
+				m[0]=pointcloud.points[i].x;
+				m[1]=pointcloud.points[i].y;
+				m[2]=pointcloud.points[i].z;
+				if(m[2]>zfilter){
+					Eigen::Matrix3d cov = Eigen::Matrix3d::Identity(3,3);//単位行列　各要素に相関なしとする
+					unsigned int nump = 1;//ボクセル内点数1点とする
+					//fprintf(stderr,"-%d-",nump);
+					map.addDistributionToCell(cov, m,nump);
+				}
+			}
 		}
-	    }
+		else{
+			///First, lets make our target map match the given map
+	    	///This is done because we want (possibly) lower resolution target map
+			double cx,cy,cz;
+			if(!nd_map.getCentroid(cx, cy, cz)){
+				fprintf(stderr,"Centroid NOT Given-abort!\n");
+				exit(1);
+			}else{
+				fprintf(stderr,"Centroid(%lf,%lf,%lf)\n",cx,cy,cz);
+			}
+
+			double wx,wy,wz;
+			if(!nd_map.getGridSizeInMeters(wx, wy, wz)){
+				fprintf(stderr,"Grid size NOT Given-abort!\n");
+				exit(1);
+			}else{
+				fprintf(stderr,"GridSize(%lf,%lf,%lf)\n",wx,wy,wz);
+			}
+
+			map.initialize(cx,cy,cz,wx,wy,wz);
+
+			std::vector<lslgeneric::NDTCell*> ndts;
+			ndts = nd_map.getAllCells();
+			fprintf(stderr,"NDT MAP with %d components",(int)ndts.size());
+			for(unsigned int i=0;i<ndts.size();i++){
+				Eigen::Vector3d m = ndts[i]->getMean();	
+				if(m[2]>zfilter){
+					Eigen::Matrix3d cov = ndts[i]->getCov();
+					unsigned int nump = ndts[i]->getN();
+					//fprintf(stderr,"-%d-",nump);
+					map.addDistributionToCell(cov, m,nump);
+				}
+			}
+
+		}
+
 
             motion_model.push_back(0.05);
             motion_model.push_back(0.05);
