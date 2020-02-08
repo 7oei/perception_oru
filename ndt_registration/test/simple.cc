@@ -71,17 +71,23 @@ main (int argc, char** argv)
     //D2Dマッチング
 	//lslgeneric::NDTMatcherD2D_2D<pcl::PointXYZ,pcl::PointXYZ> matcherD2D(false, false, resolutions);
 	lslgeneric::NDTMatcherD2D matcherD2D(false, false, resolutions);//インスタンス生成
+	
 	cloud_trans = cloud_offset;
     bool ret = matcherD2D.match(cloud,cloud_offset,Tout,true);//マッチング
-	bool set_target = matcherD2D.setInputTarget( cloud);
-	bool set_source = matcherD2D.setInputSource( cloud_offset);
-	//if(set_target&&set_source){
-		bool aligned = matcherD2D.align( init_guess);
-	//}
+
+	lslgeneric::NDTMatcherD2D pclFitD2D;//インスタンス生成
+	//pclFitD2D.setMaximumIterations(5) ;
+	//pclFitD2D.setResolution(0.5) ;
+	pclFitD2D.setResolutions(resolutions) ;
+	//pclFitD2D.setStepSize(1.5) ;
+	//pclFitD2D.setTransformationEpsilon(11e-3) ;
+	pclFitD2D.setInputTarget( cloud);
+	pclFitD2D.setInputSource( cloud_offset);
+	pclFitD2D.align( init_guess);
 
 
 	std::cout<<"Transform: \n"<<Tout.matrix()<<std::endl;
-	std::cout<<"Transform2: \n"<<matcherD2D.getFinalTransformation().matrix()<<std::endl;
+	std::cout<<"Transform2: \n"<<pclFitD2D.getFinalTransformation().matrix()<<std::endl;
 
 	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);//点群を位置合わせしてプレース
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_comb;

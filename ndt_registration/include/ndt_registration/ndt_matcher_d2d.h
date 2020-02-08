@@ -108,10 +108,44 @@ public:
 
     /**
     * add by Namihei Adachi
+    * set MaximumIterations
+    */  
+    void setMaximumIterations(int max_iter) ;
+
+    /**
+    * add by Namihei Adachi
+    * set Resolution
+    */  
+    float resolution;
+    bool single_res;
+    void setResolution(float res) ;
+
+    /**
+    * add by Namihei Adachi
+    * set Resolutions
+    */  
+    void setResolutions(std::vector<double> res) ;
+
+    /**
+    * add by Namihei Adachi
+    * set StepSize
+    */  
+    double step_size;
+    bool set_step;
+    void setStepSize(double input_step_size) ;
+
+    /**
+    * add by Namihei Adachi
+    * set TransformationEpsilon
+    */  
+    void setTransformationEpsilon(double trans_eps) ;
+
+    /**
+    * add by Namihei Adachi
     * set PointCloud by sensor
     */   
     pcl::PointCloud<pcl::PointXYZ> input_target;
-    bool setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target);
+    void setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target);
     //bool setInputTarget( NDTMap& target);
 
     /**
@@ -119,14 +153,14 @@ public:
     * set PointCloud by map
     */
     pcl::PointCloud<pcl::PointXYZ> input_source;
-    bool setInputSource( pcl::PointCloud<pcl::PointXYZ>& source);
+    void setInputSource( pcl::PointCloud<pcl::PointXYZ>& source);
     //bool setInputSource( NDTMap& source);
 
     /**
     * add by Namihei Adachi
     * match PointCloud
     */
-    bool align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& init_guess);
+    void align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& init_guess);
 
     /**
     * add by Namihei Adachi

@@ -47,23 +47,44 @@ void NDTMatcherD2D::init(bool _isIrregularGrid,
 
     nb_match_calls = 0;
     nb_success_reg = 0;
+    single_res=false;
+    set_step=false;
 }
 
-bool NDTMatcherD2D::setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target){
+void NDTMatcherD2D::setMaximumIterations(int max_iter) {
+    ITR_MAX=max_iter;
+};
+
+void NDTMatcherD2D::setResolution(float res) {
+    resolution=res;
+    single_res=true;
+};
+
+void NDTMatcherD2D::setResolutions(std::vector<double> res) {
+    resolutions=res;
+    single_res=false;
+};
+
+void NDTMatcherD2D::setStepSize(double set_step_size) {
+    step_size=set_step_size;
+    set_step=true;
+};
+
+void NDTMatcherD2D::setTransformationEpsilon(double trans_eps) {
+    DELTA_SCORE=trans_eps;
+};
+
+void NDTMatcherD2D::setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target){
     input_target=target;
-    bool set_target=true;
-    return set_target;
 };
 //bool NDTMatcherD2D::setInputTarget( NDTMap& target);
 
-bool NDTMatcherD2D::setInputSource( pcl::PointCloud<pcl::PointXYZ>& source){
+void NDTMatcherD2D::setInputSource( pcl::PointCloud<pcl::PointXYZ>& source){
     input_source=source;
-    bool set_source=true;
-    return set_source;
 };
 //bool NDTMatcherD2D::setInputSource( NDTMap& source);
 
-bool NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& T){
+void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& T){
     struct timeval tv_start, tv_end;
     struct timeval tv_start0, tv_end0;
     double time_load =0, time_match=0, time_combined=0;
@@ -74,11 +95,8 @@ bool NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
     pcl::PointCloud<pcl::PointXYZ> sourceCloud = input_source;
     Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> Temp, Tinit;
     Tinit.setIdentity();
-    if(true)//////
-    {
-        lslgeneric::transformPointCloudInPlace(T,sourceCloud);
+    lslgeneric::transformPointCloudInPlace(T,sourceCloud);
 	Tinit = T;
-    }
 
     T.setIdentity();
     bool ret = false;
@@ -103,15 +121,9 @@ bool NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
     else
 #endif
     {
-
-        //iterative regular grid
-        for(int r_ctr = resolutions.size()-1; r_ctr >=0;  r_ctr--)
-        {
-
-            current_resolution = resolutions[r_ctr];
-
-            LazyGrid prototypeSource(current_resolution);
-            LazyGrid prototypeTarget(current_resolution);
+        if(single_res){
+            LazyGrid prototypeSource(resolution);
+            LazyGrid prototypeTarget(resolution);
 
             gettimeofday(&tv_start,NULL);
             NDTMap targetNDT( &prototypeTarget );
@@ -135,29 +147,62 @@ bool NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
 
             //transform moving
             T = Temp*T; //ORIGINAL
-            //T = T*Temp;
+            //T = T*Temp;  
+        }else{
+            std::cout<<"resolutions2: \n";
+            //iterative regular grid
+            for(int r_ctr = resolutions.size()-1; r_ctr >=0;  r_ctr--)
+            {
 
-#ifdef DO_DEBUG_PROC
-            std::cout<<"RESOLUTION: "<<current_resolution<<std::endl;
-            std::cout<<"rotation   : "<<Temp.rotation().eulerAngles(0,1,2).transpose()<<std::endl;
-            std::cout<<"translation: "<<Temp.translation().transpose()<<std::endl;
-            std::cout<<"--------------------------------------------------------\nOverall Transform:\n";
-            std::cout<<"rotation   : "<<T.rotation().eulerAngles(0,1,2).transpose()<<std::endl;
-            std::cout<<"translation: "<<T.translation().transpose()<<std::endl;
-            
+                current_resolution = resolutions[r_ctr];
+                std::cout<<current_resolution<<"  ";/////
+                LazyGrid prototypeSource(current_resolution);
+                LazyGrid prototypeTarget(current_resolution);
 
-#endif
+                gettimeofday(&tv_start,NULL);
+                NDTMap targetNDT( &prototypeTarget );
+                targetNDT.loadPointCloud( input_target );
+                targetNDT.computeNDTCells();
+
+                NDTMap sourceNDT( &prototypeSource );
+                sourceNDT.loadPointCloud( sourceCloud );
+                sourceNDT.computeNDTCells();
+                gettimeofday(&tv_end,NULL);
+
+                time_load += (tv_end.tv_sec-tv_start.tv_sec)*1000.+(tv_end.tv_usec-tv_start.tv_usec)/1000.;
+                Temp.setIdentity();
+
+                gettimeofday(&tv_start,NULL);
+                ret = this->match( targetNDT, sourceNDT, Temp );//Temp
+                lslgeneric::transformPointCloudInPlace(Temp,sourceCloud);//クラウドを更新することで大まかな解像度から細かくしていく
+                gettimeofday(&tv_end,NULL);
+
+                time_match += (tv_end.tv_sec-tv_start.tv_sec)*1000.+(tv_end.tv_usec-tv_start.tv_usec)/1000.;
+
+                //transform moving
+                T = Temp*T; //ORIGINAL
+                //T = T*Temp;
+
+    #ifdef DO_DEBUG_PROC
+                std::cout<<"RESOLUTION: "<<current_resolution<<std::endl;
+                std::cout<<"rotation   : "<<Temp.rotation().eulerAngles(0,1,2).transpose()<<std::endl;
+                std::cout<<"translation: "<<Temp.translation().transpose()<<std::endl;
+                std::cout<<"--------------------------------------------------------\nOverall Transform:\n";
+                std::cout<<"rotation   : "<<T.rotation().eulerAngles(0,1,2).transpose()<<std::endl;
+                std::cout<<"translation: "<<T.translation().transpose()<<std::endl;
+                
+
+    #endif
+            }
+            std::cout<<std::endl;
         }
     }
-    if(true)/////
-    {
 	T = T*Tinit;
-    }
     gettimeofday(&tv_end0,NULL);
     time_combined = (tv_end0.tv_sec-tv_start0.tv_sec)*1000.+(tv_end0.tv_usec-tv_start0.tv_usec)/1000.;
     //std::cout<<"load: "<<time_load<<" match "<<time_match<<" combined "<<time_combined<<std::endl;
     finalT=T;
-    return ret;
+    //return ret;
 };
 
 Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> NDTMatcherD2D::getFinalTransformation (){
@@ -209,12 +254,13 @@ bool NDTMatcherD2D::match( pcl::PointCloud<pcl::PointXYZ>& target,
     else
 #endif
     {
-
+        std::cout<<"resolutions: \n";
         //iterative regular grid
         for(int r_ctr = resolutions.size()-1; r_ctr >=0;  r_ctr--)
         {
 
             current_resolution = resolutions[r_ctr];
+            std::cout<<current_resolution<<"  ";
 
             LazyGrid prototypeSource(current_resolution);
             LazyGrid prototypeTarget(current_resolution);
@@ -253,6 +299,7 @@ bool NDTMatcherD2D::match( pcl::PointCloud<pcl::PointXYZ>& target,
 
 #endif
         }
+        std::cout<<std::endl;
     }
     if(useInitialGuess)
     {
@@ -278,7 +325,6 @@ bool NDTMatcherD2D::match( NDTMap& targetNDT,
     //double NORM_MAX = current_resolution, ROT_MAX = M_PI/10; //
     int itr_ctr = 0;
     //double alpha = 0.95;
-    double step_size = 1;
     Eigen::Matrix<double,6,1>  pose_increment_v, scg;
     Eigen::MatrixXd Hessian(6,6), score_gradient(6,1); //column vectors, pose_increment_v(6,1)
 
@@ -474,12 +520,13 @@ bool NDTMatcherD2D::match( NDTMap& targetNDT,
 
         */
         //check direction here:
-
-	if(step_control) {
-	    step_size = lineSearchMT(pose_increment_v,nextNDT,targetNDT);
-	} else {
-	    step_size = 1;
-	}
+    if(!set_step){
+        if(step_control) {
+            step_size = lineSearchMT(pose_increment_v,nextNDT,targetNDT);
+        } else {
+            step_size = 1;
+        }
+    }
         pose_increment_v = step_size*pose_increment_v;
         //std::cout<<"\%iteration "<<itr_ctr<<" pose norm "<<(pose_increment_v.norm())<<" score "<<score_here<<" step "<<step_size<<std::endl;
         /*
@@ -548,10 +595,8 @@ bool NDTMatcherD2D::match( NDTMap& targetNDT,
     //std::cout<<"res "<<current_resolution<<" itr "<<itr_ctr<<std::endl;
 
 //    this->finalscore = score/NUMBER_OF_ACTIVE_CELLS;
-
     return ret;
 }
-
 //iteratively update the score gradient and hessian
 bool NDTMatcherD2D::update_gradient_hessian_local(
     Eigen::MatrixXd &score_gradient,
