@@ -42,7 +42,9 @@ main (int argc, char** argv)
     struct timeval tv_start,tv_end,tv_reg_start,tv_reg_end;
 
     Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> Tout;
+	Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> init_guess;
     Tout.setIdentity();
+	init_guess.setIdentity();
     //printf("Working");	
     if(argc == 9)
     {
@@ -65,15 +67,23 @@ main (int argc, char** argv)
             Eigen::AngleAxis<double>(roll,Eigen::Vector3d::UnitX()) *
             Eigen::AngleAxis<double>(pitch,Eigen::Vector3d::UnitY()) *
             Eigen::AngleAxis<double>(yaw,Eigen::Vector3d::UnitZ()) ;
-        
+	init_guess=Tout;
+    //D2Dマッチング
 	//lslgeneric::NDTMatcherD2D_2D<pcl::PointXYZ,pcl::PointXYZ> matcherD2D(false, false, resolutions);
-	lslgeneric::NDTMatcherD2D matcherD2D(false, false, resolutions);
+	lslgeneric::NDTMatcherD2D matcherD2D(false, false, resolutions);//インスタンス生成
 	cloud_trans = cloud_offset;
-        bool ret = matcherD2D.match(cloud,cloud_offset,Tout,true);
+    bool ret = matcherD2D.match(cloud,cloud_offset,Tout,true);//マッチング
+	bool set_target = matcherD2D.setInputTarget( cloud);
+	bool set_source = matcherD2D.setInputSource( cloud_offset);
+	//if(set_target&&set_source){
+		bool aligned = matcherD2D.align( init_guess);
+	//}
+
 
 	std::cout<<"Transform: \n"<<Tout.matrix()<<std::endl;
+	std::cout<<"Transform2: \n"<<matcherD2D.getFinalTransformation().matrix()<<std::endl;
 
-	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);
+	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);//点群を位置合わせしてプレース
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_comb;
 	pcl::PointXYZRGB red(255,0,0);
 	for(int i=0; i<cloud.points.size(); ++i ) {
@@ -99,7 +109,9 @@ main (int argc, char** argv)
 	cloud_comb.width=1;
 	cloud_comb.height=cloud_comb.points.size();
 	cloud_comb.is_dense = false;
-	pcl::io::savePCDFileBinary ("test_pcd.pcd", cloud_comb);
+	pcl::io::savePCDFileBinary ("test_pcd.pcd", cloud_comb);//点群の保存
 
     }
 }
+
+

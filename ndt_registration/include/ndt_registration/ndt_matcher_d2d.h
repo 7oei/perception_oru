@@ -107,6 +107,35 @@ public:
                 bool useInitialGuess = false);
 
     /**
+    * add by Namihei Adachi
+    * set PointCloud by sensor
+    */   
+    pcl::PointCloud<pcl::PointXYZ> input_target;
+    bool setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target);
+    //bool setInputTarget( NDTMap& target);
+
+    /**
+    * add by Namihei Adachi
+    * set PointCloud by map
+    */
+    pcl::PointCloud<pcl::PointXYZ> input_source;
+    bool setInputSource( pcl::PointCloud<pcl::PointXYZ>& source);
+    //bool setInputSource( NDTMap& source);
+
+    /**
+    * add by Namihei Adachi
+    * match PointCloud
+    */
+    bool align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& init_guess);
+
+    /**
+    * add by Namihei Adachi
+    * get Transformation
+    */
+    Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> finalT;
+    Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> getFinalTransformation ();
+    
+    /**
       * computes the covariance of the match between moving and fixed, at T.
       * note --- computes NDT distributions based on the resolution in res
       * result is returned in cov
