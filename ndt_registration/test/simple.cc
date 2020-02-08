@@ -86,8 +86,22 @@ main (int argc, char** argv)
 	pclFitD2D.align( init_guess);
 
 
+	std::cout<<"MaximumIterations: \n"<<pclFitD2D.getMaximumIterations()<<std::endl;
+	//std::cout<<"Resolution: \n"<<pclFitD2D.getResolution()<<std::endl;
+
+	std::cout<<"Resolutions: \n";
+	for(int i=0;i<pclFitD2D.getResolutions().size();i++){
+		std::cout<<pclFitD2D.getResolutions()[i]<<"  ";
+	}
+	std::cout<<std::endl;
+
+	std::cout<<"StepSize: \n"<<pclFitD2D.getStepSize()<<std::endl;
+	std::cout<<"Epsilon: \n"<<pclFitD2D.getTransformationEpsilon()<<std::endl;
+	std::cout<<"Probability: \n"<<pclFitD2D.getTransformationProbability()<<std::endl;
+
 	std::cout<<"Transform: \n"<<Tout.matrix()<<std::endl;
 	std::cout<<"Transform2: \n"<<pclFitD2D.getFinalTransformation().matrix()<<std::endl;
+
 
 	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);//点群を位置合わせしてプレース
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_comb;
@@ -119,5 +133,3 @@ main (int argc, char** argv)
 
     }
 }
-
-

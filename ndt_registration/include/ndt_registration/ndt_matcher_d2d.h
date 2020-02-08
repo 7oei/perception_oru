@@ -85,6 +85,7 @@ public:
      *   gives the initial pose estimate of \c moving. When the
      *   algorithm terminates, \c T holds the registration result.
      */
+    
     bool match( pcl::PointCloud<pcl::PointXYZ>& target,
                 pcl::PointCloud<pcl::PointXYZ>& source,
                 Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& T,
@@ -105,6 +106,7 @@ public:
                 NDTMap& source,
                 Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& T,
                 bool useInitialGuess = false);
+
 
     /**
     * add by Namihei Adachi
@@ -164,11 +166,49 @@ public:
 
     /**
     * add by Namihei Adachi
+    * get MaximumIterations
+    */
+    int getMaximumIterations() ;
+
+    /**
+    * add by Namihei Adachi
+    * get Resolution
+    */
+    float getResolution() ;
+
+    /**
+    * add by Namihei Adachi
+    * get Resolutions
+    */
+    std::vector<double> getResolutions() ;
+
+    /**
+    * add by Namihei Adachi
+    * get StepSize
+    */
+    double getStepSize() ;
+
+    /**
+    * add by Namihei Adachi
+    * get TransformationEpsilon
+    */
+    double getTransformationEpsilon() ;
+
+    /**
+    * add by Namihei Adachi
+    * get TransformationProbability
+    */
+    double final_score;
+    double getTransformationProbability() ;
+
+    /**
+    * add by Namihei Adachi
     * get Transformation
     */
     Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> finalT;
     Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> getFinalTransformation ();
-    
+
+
     /**
       * computes the covariance of the match between moving and fixed, at T.
       * note --- computes NDT distributions based on the resolution in res

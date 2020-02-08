@@ -205,6 +205,30 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
     //return ret;
 };
 
+int NDTMatcherD2D::getMaximumIterations(){
+    return ITR_MAX;
+} ;
+
+float NDTMatcherD2D::getResolution(){
+    return resolution;
+} ;
+
+std::vector<double> NDTMatcherD2D::getResolutions(){
+    return resolutions;
+} ;
+
+double NDTMatcherD2D::getStepSize(){
+    return step_size;
+} ;
+
+double NDTMatcherD2D::getTransformationEpsilon(){
+    return DELTA_SCORE;
+} ;
+
+double NDTMatcherD2D::getTransformationProbability(){
+    return final_score/input_target.points.size ();
+} ;
+
 Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> NDTMatcherD2D::getFinalTransformation (){
     return finalT;
 };
@@ -574,7 +598,7 @@ bool NDTMatcherD2D::match( NDTMap& targetNDT,
         //step_size *= alpha;
         //std::cout<<"step size "<<step_size<<std::endl;
     }
-    
+    final_score=score_best;
 //    std::cout<<"itr "<<itr_ctr<<" dScore "<< pose_increment_v.norm()<<std::endl;
     //std::vector<NDTCell<PointSource>*> nextNDT = sourceNDT.pseudoTransformNDT(T);
     score_gradient.setZero();
