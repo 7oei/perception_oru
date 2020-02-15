@@ -78,7 +78,7 @@ void NDTCell::updateSampleVariance(const Eigen::Matrix3d &cov2,const Eigen::Vect
 {
 
     if(numpointsindistribution<=2){
-	fprintf(stderr,"updateSampleVariance:: INVALID NUMBER OF POINTS\n");
+	//fprintf(stderr,"updateSampleVariance:: INVALID NUMBER OF POINTS\n");
 	return;
     }
     if(this->hasGaussian_)
