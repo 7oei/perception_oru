@@ -4,6 +4,7 @@
 #include "ndt_registration/ndt_matcher_d2d.h"
 
 #include "Eigen/Eigen"
+#include <boost/shared_ptr.hpp>
 #include <fstream>
 #include <omp.h>
 #include <sys/time.h>
@@ -53,35 +54,35 @@ void NDTMatcherD2D::init(bool _isIrregularGrid,
 
 void NDTMatcherD2D::setMaximumIterations(int max_iter) {
     ITR_MAX=max_iter;
-};
+}
 
 void NDTMatcherD2D::setResolution(float res) {
     resolution=res;
     single_res=true;
-};
+}
 
 void NDTMatcherD2D::setResolutions(std::vector<double> res) {
     resolutions=res;
     single_res=false;
-};
+}
 
 void NDTMatcherD2D::setStepSize(double set_step_size) {
     step_size=set_step_size;
     set_step=true;
-};
+}
 
 void NDTMatcherD2D::setTransformationEpsilon(double trans_eps) {
     DELTA_SCORE=trans_eps;
-};
-
+}
+pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
 void NDTMatcherD2D::setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target){
-    input_target=target;
-};
+    *target_cloud_sp=target;
+}
 //bool NDTMatcherD2D::setInputTarget( NDTMap& target);
-
+pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
 void NDTMatcherD2D::setInputSource( pcl::PointCloud<pcl::PointXYZ>& source){
-    input_source=source;
-};
+    *source_cloud_sp=source;
+}
 //bool NDTMatcherD2D::setInputSource( NDTMap& source);
 
 void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor>& T){
@@ -92,7 +93,7 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
     gettimeofday(&tv_start0,NULL);
 
     //initial guess
-    pcl::PointCloud<pcl::PointXYZ> sourceCloud = input_source;
+    pcl::PointCloud<pcl::PointXYZ> sourceCloud = *source_cloud_sp;
     Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> Temp, Tinit;
     Tinit.setIdentity();
     lslgeneric::transformPointCloudInPlace(T,sourceCloud);
@@ -107,12 +108,12 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
 
         OctTree<PointTarget> pr1;
         NDTMap<PointTarget> targetNDT( &pr1 );
-        targetNDT.loadPointCloud( input_target );
+        targetNDT.loadPointCloud( *target_cloud_sp );
         targetNDT.computeNDTCells();
 
         OctTree<PointSource> pr2;
         NDTMap<PointSource> sourceNDT( &pr2 );
-        sourceNDT.loadPointCloud( input_source );
+        sourceNDT.loadPointCloud( *source_cloud_sp );
         sourceNDT.computeNDTCells();
 
         ret = this->match( targetNDT, sourceNDT, T );
@@ -127,7 +128,7 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
 
             gettimeofday(&tv_start,NULL);
             NDTMap targetNDT( &prototypeTarget );
-            targetNDT.loadPointCloud( input_target );
+            targetNDT.loadPointCloud( *target_cloud_sp );
             targetNDT.computeNDTCells();
 
             NDTMap sourceNDT( &prototypeSource );
@@ -161,7 +162,7 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
 
                 gettimeofday(&tv_start,NULL);
                 NDTMap targetNDT( &prototypeTarget );
-                targetNDT.loadPointCloud( input_target );
+                targetNDT.loadPointCloud( *target_cloud_sp );
                 targetNDT.computeNDTCells();
 
                 NDTMap sourceNDT( &prototypeSource );
@@ -203,35 +204,43 @@ void NDTMatcherD2D::align( Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMaj
     //std::cout<<"load: "<<time_load<<" match "<<time_match<<" combined "<<time_combined<<std::endl;
     finalT=T;
     //return ret;
-};
+}
 
 int NDTMatcherD2D::getMaximumIterations(){
     return ITR_MAX;
-} ;
+} 
 
 float NDTMatcherD2D::getResolution(){
     return resolution;
-} ;
+} 
 
 std::vector<double> NDTMatcherD2D::getResolutions(){
     return resolutions;
-} ;
+} 
 
 double NDTMatcherD2D::getStepSize(){
     return step_size;
-} ;
+} 
 
 double NDTMatcherD2D::getTransformationEpsilon(){
     return DELTA_SCORE;
-} ;
+} 
 
 double NDTMatcherD2D::getTransformationProbability(){
-    return final_score/input_target.points.size ();
-} ;
+    return final_score/target_cloud_sp->points.size ();
+} 
+
+boost::shared_ptr< const pcl::PointCloud<pcl::PointXYZ> > NDTMatcherD2D::getInputTarget(){
+    return target_cloud_sp;
+}
+
+boost::shared_ptr< const pcl::PointCloud<pcl::PointXYZ> > NDTMatcherD2D::getInputSource(){
+    return source_cloud_sp;
+}
 
 Eigen::Transform<double,3,Eigen::Affine,Eigen::ColMajor> NDTMatcherD2D::getFinalTransformation (){
     return finalT;
-};
+}
 
 bool NDTMatcherD2D::match( pcl::PointCloud<pcl::PointXYZ>& target,
         pcl::PointCloud<pcl::PointXYZ>& source,

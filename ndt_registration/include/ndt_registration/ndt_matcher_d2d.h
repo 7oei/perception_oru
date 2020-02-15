@@ -39,12 +39,16 @@
 #include "pcl/point_cloud.h"
 #include "Eigen/Core"
 
+#include <boost/shared_ptr.hpp>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
+
+
 namespace lslgeneric
 {
+
 
 /**
  * This class implements NDT registration for 3D point cloud scans.
@@ -146,7 +150,6 @@ public:
     * add by Namihei Adachi
     * set PointCloud by sensor
     */   
-    pcl::PointCloud<pcl::PointXYZ> input_target;
     void setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target);
     //bool setInputTarget( NDTMap& target);
 
@@ -154,7 +157,6 @@ public:
     * add by Namihei Adachi
     * set PointCloud by map
     */
-    pcl::PointCloud<pcl::PointXYZ> input_source;
     void setInputSource( pcl::PointCloud<pcl::PointXYZ>& source);
     //bool setInputSource( NDTMap& source);
 
@@ -200,6 +202,20 @@ public:
     */
     double final_score;
     double getTransformationProbability() ;
+
+    /**
+    * add by Namihei Adachi
+    * get TransformationProbability
+    */
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
+    boost::shared_ptr< const pcl::PointCloud<pcl::PointXYZ> > getInputTarget() ;
+
+    /**
+    * add by Namihei Adachi
+    * get TransformationProbability
+    */
+    //pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
+    boost::shared_ptr< const pcl::PointCloud<pcl::PointXYZ> > getInputSource() ;
 
     /**
     * add by Namihei Adachi

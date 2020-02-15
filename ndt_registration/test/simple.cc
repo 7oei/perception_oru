@@ -101,7 +101,9 @@ main (int argc, char** argv)
 
 	std::cout<<"Transform: \n"<<Tout.matrix()<<std::endl;
 	std::cout<<"Transform2: \n"<<pclFitD2D.getFinalTransformation().matrix()<<std::endl;
-
+	pcl::io::savePCDFileBinary ("target_pcd.pcd", *pclFitD2D.getInputTarget());
+	pcl::io::savePCDFileBinary ("source_pcd.pcd", *pclFitD2D.getInputSource());
+	std::cout<<"target&sorce output"<<std::endl;
 
 	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);//点群を位置合わせしてプレース
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_comb;
