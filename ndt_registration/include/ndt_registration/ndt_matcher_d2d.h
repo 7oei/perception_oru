@@ -150,14 +150,14 @@ public:
     * add by Namihei Adachi
     * set PointCloud by sensor
     */   
-    void setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target);
+    void setInputTarget( const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > &target);
     //bool setInputTarget( NDTMap& target);
 
     /**
     * add by Namihei Adachi
     * set PointCloud by map
     */
-    void setInputSource( pcl::PointCloud<pcl::PointXYZ>& source);
+    void setInputSource( const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >& source);
     //bool setInputSource( NDTMap& source);
 
     /**

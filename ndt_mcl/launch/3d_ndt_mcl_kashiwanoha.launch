@@ -5,7 +5,7 @@
     <param name="calibration" value="$(find ndt_fuser)/launch/velo32.yaml" />
     </node>
      -->
-    <node pkg="ndt_mcl" type="3d_ndt_mcl_node2" required="true" name="NDTMCL3D">
+    <node pkg="ndt_mcl" type="3d_ndt_mcl_node2" required="true" name="NDTMCL3D" output="screen">
     <param name="points_topic" value="/points_raw" /><!-- /velodyne_points -->
     <param name="odometry_topic" value="/vehicle/odom" /><!-- /vmc_navserver/odom -->
     <param name="map_resolution" value="2.0" /><!-- 0.4 -->

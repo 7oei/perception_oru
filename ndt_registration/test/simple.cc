@@ -81,8 +81,14 @@ main (int argc, char** argv)
 	pclFitD2D.setResolutions(resolutions) ;
 	//pclFitD2D.setStepSize(1.5) ;
 	//pclFitD2D.setTransformationEpsilon(11e-3) ;
-	pclFitD2D.setInputTarget( cloud);
-	pclFitD2D.setInputSource( cloud_offset);
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud(new pcl::PointCloud<pcl::PointXYZ>());
+  	pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud(new pcl::PointCloud<pcl::PointXYZ>());
+	*target_cloud=cloud;
+	*source_cloud=cloud_offset;
+	
+	pclFitD2D.setInputTarget( target_cloud);
+	pclFitD2D.setInputSource( source_cloud);
 	pclFitD2D.align( init_guess);
 
 
@@ -104,7 +110,7 @@ main (int argc, char** argv)
 	pcl::io::savePCDFileBinary ("target_pcd.pcd", *pclFitD2D.getInputTarget());
 	pcl::io::savePCDFileBinary ("source_pcd.pcd", *pclFitD2D.getInputSource());
 	std::cout<<"target&sorce output"<<std::endl;
-
+	std::cout<<"fin"<<std::endl;
 	lslgeneric::transformPointCloudInPlace(Tout,cloud_trans);//点群を位置合わせしてプレース
 	pcl::PointCloud<pcl::PointXYZRGB> cloud_comb;
 	pcl::PointXYZRGB red(255,0,0);

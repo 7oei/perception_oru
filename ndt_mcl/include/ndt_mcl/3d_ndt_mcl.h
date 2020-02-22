@@ -63,8 +63,8 @@ class NDTMCL3D{
 			}
 		}
 		else{
-			///First, lets make our target map match the given map
-	    	///This is done because we want (possibly) lower resolution target map
+		///First, lets make our target map match the given map
+	    ///This is done because we want (possibly) lower resolution target map
 			double cx,cy,cz;
 			if(!nd_map.getCentroid(cx, cy, cz)){
 				fprintf(stderr,"Centroid NOT Given-abort!\n");
@@ -98,6 +98,9 @@ class NDTMCL3D{
 
 		}
 
+	    
+	    
+		
 
             motion_model.push_back(0.05);
             motion_model.push_back(0.05);

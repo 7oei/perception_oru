@@ -75,13 +75,13 @@ void NDTMatcherD2D::setTransformationEpsilon(double trans_eps) {
     DELTA_SCORE=trans_eps;
 }
 pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
-void NDTMatcherD2D::setInputTarget( pcl::PointCloud<pcl::PointXYZ>& target){
-    *target_cloud_sp=target;
+void NDTMatcherD2D::setInputTarget( const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> > &target){
+    target_cloud_sp=target;
 }
 //bool NDTMatcherD2D::setInputTarget( NDTMap& target);
 pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud_sp(new pcl::PointCloud<pcl::PointXYZ>);
-void NDTMatcherD2D::setInputSource( pcl::PointCloud<pcl::PointXYZ>& source){
-    *source_cloud_sp=source;
+void NDTMatcherD2D::setInputSource( const boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ> >& source){
+    source_cloud_sp=source;
 }
 //bool NDTMatcherD2D::setInputSource( NDTMap& source);
 
